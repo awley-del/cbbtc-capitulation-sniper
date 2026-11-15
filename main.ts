@@ -5,16 +5,18 @@
 // small-dip mean reversion and momentum bursts both lose money here after fees
 // (a full round trip costs ~26-42 bps); the only durable edge is the
 // capitulation V-reversal: buy a washout from the 120-bar high once the price
-// starts to recover, hold for the rebound, exit at +4% / -1.5% / 120 bars.
+// starts to recover, hold for the rebound, exit at +4% / -1.5% / 125 bars.
 // DIP is set at 2.5% rather than 3%: on the dev window 3% scores a little
 // higher (+$55.33 vs +$40.15) but makes zero trades in the quiet first half,
 // while 2.5% trades in both halves — on the unseen race window a 2.5% washout
 // is materially more likely to occur at all, and a bot that never trades
 // cannot pass the race guardrail (≥1 trade) however good its dev score is.
 //
-// Everything is integer (BigInt) math on the bar closes: no floats, no clock,
-// no randomness, no network, no files. Two runs on the same data decide the
-// same orders byte for byte.
+// v2 (round 2, 15 Nov): MAX_HOLD_BARS 120 -> 125. Dev grade-local +$52.48
+// (vs +$40.15 for the submitted 120-bar version), same 3 entries, win rate
+// 1.0, max drawdown 1.62%. The gain is exit timing on the two flat trades,
+// not new entries — block-bootstrap is statistically tied with the baseline,
+// so treat the +$12.33 as a low-risk swap, not a proven edge. See REPORT-v2.md.
 
 import { runBars } from './vendor/makefun-bars.ts';
 
@@ -31,7 +33,7 @@ const TAKE_PROFIT_NUM = 104; // exit at +4% over cost basis
 const TAKE_PROFIT_DEN = 100;
 const STOP_LOSS_NUM = 985; // exit at -1.5% under cost basis
 const STOP_LOSS_DEN = 1000;
-const MAX_HOLD_BARS = 120; // exit at the latest after 120 bars held
+const MAX_HOLD_BARS = 125; // exit at the latest after 125 bars held
 const COOLDOWN_BARS = 15; // bars to wait after an exit before a new entry
 const MAX_SLIPPAGE_BPS = 200; // bounds the fill vs the decision close
 
